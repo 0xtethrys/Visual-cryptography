@@ -1,5 +1,4 @@
-# Visual-cryptography
-# Visual Cryptography Python Algorithm (Encryption)
+# Visual Cryptography Python Algorithm
 from PIL import Image, ImageDraw
 import os
 import sys
