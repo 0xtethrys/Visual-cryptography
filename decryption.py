@@ -1,3 +1,4 @@
+# Visual Cryptography Python Algorithm
 try:
     # Prompt user to enter the path of the image file and encryption key
     path = input(r'Enter path of Image: ')
