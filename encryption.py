@@ -1,67 +1,45 @@
 # Visual Cryptography Python Algorithm
-from PIL import Image, ImageDraw
 import os
-import sys
-from random import SystemRandom
+import traceback
 
-random = SystemRandom()
-
-if len(sys.argv) != 2:
-    print("This script requires one argument: the image to be split.")
-    exit()
-
-infile = str(sys.argv[1])
-
-if not os.path.isfile(infile):
-    print("The specified file does not exist.")
-    exit()
-
-img = Image.open(infile)
-f, e = os.path.splitext(infile)
-out_filename_A = f + "_A.png"
-out_filename_B = f + "_B.png"
-
-img = img.convert('1')  # convert image to 1 bit
-print("Image size: {}".format(img.size))
-
-# prepare two empty slider images for drawing
-width = img.size[0] * 2
-height = img.size[1] * 2
-print("{}x{}".format(width, height))
-
-out_image_A = Image.new('1', (width, height))
-out_image_B = Image.new('1', (width, height))
-
-draw_A = ImageDraw.Draw(out_image_A)
-draw_B = ImageDraw.Draw(out_image_B)
-
-# There are 6 (4 choose 2) possible patterns
-patterns = ((1, 1, 0, 0), (1, 0, 1, 0), (1, 0, 0, 1), (0, 1, 1, 0), (0, 1, 0, 1), (0, 0, 1, 1))
-
-# cycle through pixels
-for x in range(0, int(width / 2)):
-    for y in range(0, int(height / 2)):
-        pixel = img.getpixel((x, y))
-        pat = random.choice(patterns)
-
-        # A will always get the pattern
-        draw_A.point((x * 2, y * 2), pat[0])
-        draw_A.point((x * 2 + 1, y * 2), pat[1])
-        draw_A.point((x * 2, y * 2 + 1), pat[2])
-        draw_A.point((x * 2 + 1, y * 2 + 1), pat[3])
-
-        if pixel == 0:  # dark pixel so B gets the anti pattern
-            draw_B.point((x * 2, y * 2), 1 - pat[0])
-            draw_B.point((x * 2 + 1, y * 2), 1 - pat[1])
-            draw_B.point((x * 2, y * 2 + 1), 1 - pat[2])
-            draw_B.point((x * 2 + 1, y * 2 + 1), 1 - pat[3])
-        else:
-            draw_B.point((x * 2, y * 2), pat[0])
-            draw_B.point((x * 2 + 1, y * 2), pat[1])
-            draw_B.point((x * 2, y * 2 + 1), pat[2])
-            draw_B.point((x * 2 + 1, y * 2 + 1), pat[3])
-
-out_image_A.save(out_filename_A, 'PNG')
-out_image_B.save(out_filename_B, 'PNG')
-
-print("Encryption process completed successfully.")
+try:
+    # Take the path of the image as input
+    path = input(r'Enter path of Image : ')
+    
+    # Validate the path
+    if not os.path.isfile(path):
+        print("Invalid path or file does not exist")
+        exit()
+    
+    # Take the encryption key as input
+    key = input('Enter Key for encryption of Image : ')
+    
+    # Validate the key
+    if not key.isdigit():
+        print("Invalid key, must be an integer")
+        exit()
+    
+    key = int(key)
+    
+    # Print the path of the image file and the encryption key
+    print('The path of file : ', path)
+    print('Key for encryption : ', key)
+    
+    # Open the file for reading
+    with open(path, 'rb') as fin:
+        # Read the image data
+        image = bytearray(fin.read())
+    
+    # Perform XOR operation on each value of the bytearray
+    for index, value in enumerate(image):
+        image[index] = value ^ key
+    
+    # Open the file for writing
+    with open(path, 'wb') as fin:
+        # Write the encrypted data back to the image file
+        fin.write(image)
+    
+    print('Encryption Done...')
+    
+except Exception:
+    print('Error caught : ', traceback.format_exc())
